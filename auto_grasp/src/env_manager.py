@@ -1,39 +1,6 @@
 import rospy
-import numpy as np
 from geometry_msgs.msg import Pose
 from gazebo_msgs.srv import GetWorldProperties, SpawnModel, DeleteModel, SetLinkProperties
-
-class Model():
-    def __init__(self, name: str = None, sdf_name: str = None) -> None:  
-        self.name, self.sdf_name = name, sdf_name
-
-    def grasp_gen(self, path: str = None) -> np.ndarray:
-        """
-        Generate grasp dictionary based on the current object pose and 
-        contact point pairs (cpp).
-
-        Parameters
-        ----------
-        path : string
-            path to a .txt file of cpps
-
-        Returns
-        -------
-        centers : 3xN : obj : `np.ndarray`
-            array of potential gripper centers w.r.t the world frame
-        directions : 3xN : obj : `np.ndarray`
-            array of potential gripper directions w.r.t the world frame
-        """
-        with open(path) as f:
-            cpps = eval(f.read())
-        cpps = np.asarray(cpps).T
-        
-        # array of potential gripper configurations w.r.t the object frame
-        # 0.005 = 0.001(mm to m) * 0.5
-        centers = 0.0005 * (cpps[:3,:] + cpps[3:,:])
-        directions = cpps[:3,:] - cpps[3:,:]
-        
-        return centers, directions
 
 class EnvManager():
     def __init__(self) -> None:
@@ -57,7 +24,7 @@ class EnvManager():
         world_state_client = rospy.ServiceProxy( '/gazebo/get_world_properties', GetWorldProperties)
         obj_names, obj_list = world_state_client.call().model_names, []
         for name in obj_names:
-            obj_list.append(Model(name))
+            obj_list.append(name)
 
         return obj_list
 
@@ -107,7 +74,7 @@ class EnvManager():
         spawn_model_client(model_name=name,
         model_xml=open(f'../../models/{sdf_name}/model.sdf', 'r').read(),
         robot_namespace='/foo', initial_pose=pose, reference_frame='world')
-        self.added_objects.append(Model(name, sdf_name))
+        self.added_objects.append([name, sdf_name])
 
     @staticmethod
     def delete_object(name: str) -> None:

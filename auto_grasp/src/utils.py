@@ -27,52 +27,66 @@ class Conversion():
         return Pose(position=position, orientation=quat)
 
     @staticmethod
-    def pose2T(pose: Pose) -> np.ndarray:
+    def cpp2T(center: np.ndarray, direction: np.ndarray, aprv: np.ndarray) -> np.ndarray:
         """
         Convert ROS Pose message format to homegeneous transformation. 
 
         Parameters
         ----------
-        pose : obj : `Pose`
-            pose message composed with xyz and quaternion
+        center : 3x1 : obj : `np.ndarray`
+            gripper center w.r.t the world frame
+        direction : 3x1 : obj : `np.ndarray`
+            gripper direction w.r.t the world frame
+        aprv : 3xN : obj : `np.ndarray`
+            approach vector of a gripper of a cpp
 
         Returns
         -------
         res : 4x4 : obj : `np.ndarray`
             homegeneous transformation format
         """
+        last_ax = np.cross(direction, aprv)
+        R = np.eye(3)
+        R[0,:], R[1,:], R[2,:] = direction, last_ax, aprv
+
         res = np.eye(4)
-        res[:3,3] = [pose.position.x, pose.position.y, pose.position.z]
-        quat = [pose.orientation.x, pose.orientation.y, pose.orientation.z, 
-                pose.orientation.w]
-        res[:3,:3] = R.from_quat(quat).as_matrix()
-
+        res[:3,:3] = R
+        res[3,:3] = R @ center.reshape((3, 1))
+        
         return res
-
-def rot_matrix(axis_1: np.ndarray, axis_2: np.ndarray) -> np.ndarray:
-    """ 
-    Calculate a rotation matrix that aligns the axis_2 with the axis_1.
     
+def grasp_gen(path: str = None) -> np.ndarray:
+    """
+    Generate grasp dictionary based on the current object pose and 
+    contact point pairs (cpp).
+
     Parameters
     ----------
-    axis_1 : 1x3 : obj : `np.ndarray`
-        unit direction vector 
-    axis_2 : 1x3 : obj : `np.ndarray`
-        unit direction vector
+    path : string
+        root path to a .txt file of cpps and aprv
 
     Returns
     -------
-    R : 3x3 :obj:`numpy.ndarray`
-        rotation matrix
+    centers : 3xN : obj : `np.ndarray`
+        array of potential gripper centers w.r.t the world frame
+    directions : 3xN : obj : `np.ndarray`
+        array of potential gripper directions w.r.t the world frame
+    aprvs : 1xN : obj : `list`
+        list of approach vectors for each cpp
     """
-    R = np.eye(3, dtype=np.float64)
+    path_cpps = f'{path}/cpps.txt'
+    path_aprvs = f'{path}/aprvs.txt'
 
-    try:
-        v = np.cross(axis_2, axis_1)
-        c = np.dot(axis_2, axis_1)
-        Vmat = np.array([[0., -v[2], v[1]], [v[2], 0., -v[0]], [-v[1], v[0], 0.]])
-        R = R + Vmat + Vmat @ Vmat / (1 + c)
-    except:
-        print('Vectors are in exactly opposite direction')
+    with open(path_cpps) as f1:
+        cpps = eval(f1.read())
+    cpps = np.asarray(cpps).T
 
-    return R
+    with open(path_aprvs) as f2:
+        aprvs = eval(f2.read())
+    
+    # array of potential gripper configurations w.r.t the object frame
+    # 0.005 = 0.001(mm to m) * 0.5
+    centers = 0.0005 * (cpps[:3,:] + cpps[3:6,:])
+    directions = cpps[:3,:] - cpps[3:6,:]
+    
+    return centers, directions, aprvs

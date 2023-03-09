@@ -9,6 +9,25 @@ class Move_Robot():
         mc.roscpp_initialize(sys.argv)
         self.gripper = mc.MoveGroupCommander("gripper_fingers")
 
+    def gripper_control(self, command: bool = True) -> None:
+        """
+        Open or close gripper. 
+
+        Parameters
+        ----------
+        command: bool
+            close (True) or open (False) the robot gripper
+
+        Returns
+        -------
+        None
+        """
+        if command:
+            self.gripper.go([0.0065, -0.0065], wait=True)
+        else:
+            self.gripper.go([-0.021, 0.021], wait=True)
+        self.gripper.stop()
+
     @staticmethod
     def is_grasped(joint_names: list = ['Slider01', 'Slider02'], close_pos: list = [0.0065, -0.0065],
                    threshold: float = 0.0005):
@@ -37,25 +56,6 @@ class Move_Robot():
                 return False
 
         return True
-
-    def gripper_control(self, command: bool = True) -> None:
-        """
-        Open or close gripper. 
-
-        Parameters
-        ----------
-        command: bool
-            close (True) or open (False) the robot gripper
-
-        Returns
-        -------
-        None
-        """
-        if command:
-            self.gripper.go([0.0065, -0.0065], wait=True)
-        else:
-            self.gripper.go([-0.021, 0.021], wait=True)
-        self.gripper.stop()
 
     @staticmethod
     def get_link_pose(name: str) -> Pose:
