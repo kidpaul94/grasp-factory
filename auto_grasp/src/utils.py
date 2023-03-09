@@ -76,20 +76,3 @@ def rot_matrix(axis_1: np.ndarray, axis_2: np.ndarray) -> np.ndarray:
         print('Vectors are in exactly opposite direction')
 
     return R
-
-def noisy_pose(sixd: list) -> list:
-    """
-    Add gaussian noise on pose values.
-
-    Parameters
-    ----------
-    sixd : 1x6 : obj : `list`
-        list of xyz and three euler angles
-
-    Returns
-    -------
-    `list` : xyz and three euler angles that we add noise on
-    """
-    noise = np.random.normal(0,1,6)
-
-    return sixd + noise

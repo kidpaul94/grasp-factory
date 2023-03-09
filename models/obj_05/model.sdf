@@ -18,7 +18,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://obj_05/meshes/obj_05.stl</uri>
+            <uri>/home/kidpaul/catkin_ws/src/grasp-factory/models/obj_05/meshes/obj_05.stl</uri> 
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -39,7 +39,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://obj_05/meshes/obj_05.stl</uri>
+            <uri>/home/kidpaul/catkin_ws/src/grasp-factory/models/obj_05/meshes/obj_05.stl</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
@@ -89,9 +89,10 @@
           </contact>
         </surface>
       </collision>
+      <gravity>0</gravity>
     </link>
-    <!-- <gravity>0</gravity>
-    <static>1</static> -->
     <allow_auto_disable>1</allow_auto_disable>
   </model>
 </sdf>
+
+

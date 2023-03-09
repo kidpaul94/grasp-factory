@@ -1,14 +1,11 @@
 import rospy
 import numpy as np
 from geometry_msgs.msg import Pose
-from gazebo_msgs.srv import GetWorldProperties, SpawnModel, DeleteModel, GetModelState
-
-from utils import Conversion
+from gazebo_msgs.srv import GetWorldProperties, SpawnModel, DeleteModel, SetLinkProperties
 
 class Model():
-    def __init__(self, name: str = None, pose: Pose = None, sdf_name: str = None) -> None:  
-        self.name, self.init_pose, self.sdf_name = name, pose, sdf_name
-        self.base2obj = Conversion().pose2T(pose)
+    def __init__(self, name: str = None, sdf_name: str = None) -> None:  
+        self.name, self.sdf_name = name, sdf_name
 
     def grasp_gen(self, path: str = None) -> np.ndarray:
         """
@@ -33,15 +30,9 @@ class Model():
         
         # array of potential gripper configurations w.r.t the object frame
         # 0.005 = 0.001(mm to m) * 0.5
-        add_row = np.ones(cpps.shape[1])
         centers = 0.0005 * (cpps[:3,:] + cpps[3:,:])
         directions = cpps[:3,:] - cpps[3:,:]
-
-        # array of potential gripper configurations w.r.t the world frame
-        temp = self.base2obj @ np.vstack((centers, add_row))
-        centers = temp[:3,:]
-        directions = self.base2obj[:3,:3] @ directions
-
+        
         return centers, directions
 
 class EnvManager():
@@ -66,8 +57,7 @@ class EnvManager():
         world_state_client = rospy.ServiceProxy( '/gazebo/get_world_properties', GetWorldProperties)
         obj_names, obj_list = world_state_client.call().model_names, []
         for name in obj_names:
-            pose = self.get_object_pose(name)
-            obj_list.append(Model(name, pose))
+            obj_list.append(Model(name))
 
         return obj_list
 
@@ -117,7 +107,7 @@ class EnvManager():
         spawn_model_client(model_name=name,
         model_xml=open(f'../../models/{sdf_name}/model.sdf', 'r').read(),
         robot_namespace='/foo', initial_pose=pose, reference_frame='world')
-        self.added_objects.append(Model(name, pose, sdf_name))
+        self.added_objects.append(Model(name, sdf_name))
 
     @staticmethod
     def delete_object(name: str) -> None:
@@ -138,21 +128,19 @@ class EnvManager():
         delete_model_client.call(model_name=name)
 
     @staticmethod
-    def get_object_pose(name: str) -> Pose:
+    def set_link_prop(name: str) -> None:
         """
-        Retrieve an object pose from the gazebo world.
+        Set object link properties int the gazebo world.
 
         Parameters
         ----------
         name : string
-            name of the object in the gazebo world
+            name of the object link in the gazebo world
 
         Returns
         -------
-        `Pose` : current pose of the object in the gazebo world
+        None
         """
-        rospy.wait_for_service('/gazebo/get_model_state')
-        model_state_client = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
-        state = model_state_client.call(model_name=name, relative_entity_name='map')
-
-        return state.pose
+        rospy.wait_for_service('/gazebo/set_link_properties')
+        link_state_client = rospy.ServiceProxy( '/gazebo/set_link_properties', SetLinkProperties)
+        link_state_client.call(link_name=name, gravity_mode=True)
