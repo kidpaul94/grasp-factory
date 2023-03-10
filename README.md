@@ -65,7 +65,7 @@ The representation is defined based on a coordinate system of each object 3D mod
 <img src=./images/representation.png width=25% height=25%>
 </p>
 
-The image above shows the **grasping center & direction & approach vector** format that we use to spawn an object at specific poses. In [simulation.py](https://github.com/kidpaul94/grasp-factory/blob/main/auto_grasp/src/simulation.py), we utilize a list of this representation as a grasp dictionary associated with a specific object model and check success/failure of each planned grasp.
+The image above shows the **grasping center & direction & approach vector** format that we use to spawn an object at specific poses. In [`simulation.py`](https://github.com/kidpaul94/grasp-factory/blob/main/auto_grasp/src/simulation.py), we utilize a list of this representation as a grasp dictionary associated with a specific object model and check success/failure of each planned grasp.
 
 ## ToDo Lists
 
