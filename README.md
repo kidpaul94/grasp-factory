@@ -1,5 +1,5 @@
 # grasp-factory
-Automatic Grasp Success/Failure Checker based on Gazebo
+Automatic Grasp Success/Failure Checker based on Gazebo (ROS1). Depending on user's inputs (e.g., list of planned grasps), the program spawn an obect and a gripper ([Gripkit-CR-Plus-L](https://weiss-robotics.com/gripkit/)) to check success/failure of each planned grasp.
 
 ## Table of Contents
 
@@ -61,8 +61,14 @@ It also depends on **numpy**, **scipy**, and **tqdm**:
 > **Note**
 The representation is defined based on a coordinate system of each object 3D model.
 
+<p align="center">
+<img src=./images/representation.png width=25% height=25%>
+</p>
+
+The image above shows the **grasping center & direction $ approach vector** format that we use to spawn an object at specific poses. In [simulation.py](https://github.com/kidpaul94/grasp-factory/blob/main/auto_grasp/src/simulation.py), we utilize a list of this representation as a grasp dictionary associated with a specific object model and check success/failure of each planned grasp.
+
 ## ToDo Lists
 
 | **Model & Controller parameters tuning** | ![Progress](https://progress-bar.dev/90) |
 | --- | --- |
-| **Documentation** | ![Progress](https://progress-bar.dev/10) |
+| **Documentation** | ![Progress](https://progress-bar.dev/30) |
