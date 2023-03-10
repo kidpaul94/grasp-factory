@@ -42,10 +42,10 @@ class EnvManager():
         None
         """
         check_objects = self.get_gazebo_objects()
-        added_org = set(temp.name for temp in self.added_objects)
+        added_org = set(temp[0] for temp in self.added_objects)
         added_left, added_perm = [], []
         for obj in check_objects:
-            if obj.name in added_org:
+            if obj in added_org:
                 added_left.append(obj)
             else:
                 added_perm.append(obj)

@@ -9,6 +9,7 @@ Automatic Grasp Success/Failure Checker based on Gazebo
 - [Automated Grasping](#automated-grasping)
     - [How to Run](#how-to-run)
     - [Grasp Representation](#grasp-representation)
+- [ToDo Lists](#todo-lists)
 
 ---
 
@@ -59,3 +60,9 @@ It also depends on **numpy**, **scipy**, and **tqdm**:
 
 > **Note**
 The representation is defined based on a coordinate system of each object 3D model.
+
+## ToDo Lists
+
+| **Model & Controller parameters tuning** | ![Progress](https://progress-bar.dev/90) |
+| --- | --- |
+| **Documentation** | ![Progress](https://progress-bar.dev/10) |

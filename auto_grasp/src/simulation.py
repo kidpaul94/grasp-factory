@@ -13,7 +13,7 @@ def parse_args(argv=None) -> None:
     parser = argparse.ArgumentParser(description='auto_grasp')
     parser.add_argument('--name', default='object_1', type=str,
                         help='name of the object in the gazebo world.')
-    parser.add_argument('--sixd', default=[0., 0., 0.85, 0, 0, 0.], type=list, 
+    parser.add_argument('--sixd', default=[0., 0., 0.85, 0., 0., 0.], type=list, 
                         help='list of xyz and three euler angles.')
     parser.add_argument('--sdf_names', default=['obj_05'], type=str, nargs='+',
                         help='sdf files of objects we sequentially spawn in the gazebo world.')
@@ -29,7 +29,7 @@ class Auto_grasp():
     def __init__(self, args):
         self.mr = Move_Robot()
         self.EM, self.conv = EnvManager(), Conversion()
-        self.pose = self.conv.list2pose(sixd=args.sixd)
+        self.init_T = self.conv.list2T(sixd=args.sixd)
         self.name, self.sdf_names = args.name, args.sdf_names
         self.grasp_dicts = args.grasp_dicts
 
@@ -41,7 +41,7 @@ class Auto_grasp():
         Parameters
         ----------
         center : 3x1 : obj : `np.ndarray`
-            gripper center w.r.t the world frame
+            gripper center w.r.t the world frame (in mm)
         direction : 3x1 : obj : `np.ndarray`
             gripper direction w.r.t the world frame
         sdf_name : string
@@ -54,20 +54,19 @@ class Auto_grasp():
         float : probability of successing the grasp
         """
         attempt, total = 0, len(aprvs)
-        
         for aprv in aprvs:
             self.mr.gripper_control(command=False)
             time.sleep(0.5)
             # T = grasp config w.r.t an object frame
-            T_inv = Conversion().cpp2T(center=center, direction=direction, aprv=aprv) 
-            spawn_pose = self.pose @ T_inv
+            T_inv = self.conv.cpp2T(center=center, direction=direction, aprv=aprv)
+            spawn_pose = self.conv.T2pose(self.init_T @ T_inv) 
 
             self.EM.spawn_object(name=self.name, pose=spawn_pose, sdf_name=sdf_name)
             time.sleep(0.5)
             self.EM.sync_with_gazebo()
             time.sleep(0.5)
             self.mr.gripper_control()
-            time.sleep(0.5)
+            time.sleep(1.0)
             self.EM.set_link_prop(name='object') # must be a link name in model.sdf
             time.sleep(1.0)
 

@@ -5,9 +5,9 @@ from geometry_msgs.msg import Point, Quaternion, Pose
 class Conversion():
     
     @staticmethod
-    def list2pose(sixd: list, degrees: bool = True) -> Pose:
+    def list2T(sixd: list, degrees: bool = True) -> np.ndarray:
         """
-        Convert 6D representation to ROS Pose message format.
+        Convert 6D representation to homegeneous transformation format.
 
         Parameters
         ----------
@@ -18,10 +18,33 @@ class Conversion():
 
         Returns
         -------
+        res : 4x4 : obj : `np.ndarray`
+            homegeneous transformation format
+        """
+        t = np.array(sixd[:3])
+        rot = R.from_euler('xyz', sixd[3:], degrees).as_matrix()
+
+        res = np.eye(4)
+        res[:3,:3] = rot
+        res[:3,3] = t
+
+        return res
+    
+    @staticmethod
+    def T2pose(T: np.ndarray) -> Pose:
+        """
+        Convert homegeneous transformation to ROS Pose message format.
+        Parameters
+        ----------
+        T : 4x4 : obj : `np.ndarray`
+            homegeneous transformation
+
+        Returns
+        -------
         `Pose` : pose message composed with xyz and quaternion
         """
-        position = Point(sixd[0], sixd[1], sixd[2])
-        temp = R.from_euler('xyz', sixd[3:], degrees).as_quat()
+        position = Point(T[0,3], T[1,3], T[2,3])
+        temp = R.from_matrix(T[:3,:3]).as_quat()
         quat = Quaternion(temp[0], temp[1], temp[2], temp[3])
 
         return Pose(position=position, orientation=quat)
@@ -29,12 +52,12 @@ class Conversion():
     @staticmethod
     def cpp2T(center: np.ndarray, direction: np.ndarray, aprv: np.ndarray) -> np.ndarray:
         """
-        Convert ROS Pose message format to homegeneous transformation. 
+        Convert contact point pair format to homegeneous transformation. 
 
         Parameters
         ----------
         center : 3x1 : obj : `np.ndarray`
-            gripper center w.r.t the world frame
+            gripper center w.r.t the world frame (in mm)
         direction : 3x1 : obj : `np.ndarray`
             gripper direction w.r.t the world frame
         aprv : 3xN : obj : `np.ndarray`
@@ -45,20 +68,21 @@ class Conversion():
         res : 4x4 : obj : `np.ndarray`
             homegeneous transformation format
         """
-        last_ax = np.cross(direction, aprv)
+        last_ax = np.cross(aprv, direction)
         R = np.eye(3)
-        R[0,:], R[1,:], R[2,:] = direction, last_ax, aprv
-
+        R[:,0], R[:,1], R[:,2] = direction, last_ax, aprv
+        
+        center = 0.001 * center 
         res = np.eye(4)
-        res[:3,:3] = R
-        res[3,:3] = R @ center.reshape((3, 1))
+        res[:3,:3] = R.T
+        res[:3,3] = -R.T @ center
         
         return res
     
 def grasp_gen(path: str = None) -> np.ndarray:
     """
-    Generate grasp dictionary based on the current object pose and 
-    contact point pairs (cpp).
+    Generate grasp dictionary based on contact point pairs (cpp)
+    and approach vectors (aprv).
 
     Parameters
     ----------
@@ -68,7 +92,7 @@ def grasp_gen(path: str = None) -> np.ndarray:
     Returns
     -------
     centers : 3xN : obj : `np.ndarray`
-        array of potential gripper centers w.r.t the world frame
+        array of potential gripper centers w.r.t the world frame (in mm)
     directions : 3xN : obj : `np.ndarray`
         array of potential gripper directions w.r.t the world frame
     aprvs : 1xN : obj : `list`

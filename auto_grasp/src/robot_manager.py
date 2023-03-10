@@ -1,8 +1,7 @@
 import sys
 import rospy
 import moveit_commander as mc
-from geometry_msgs.msg import Pose
-from gazebo_msgs.srv import GetLinkState, GetJointProperties
+from gazebo_msgs.srv import GetJointProperties
 
 class Move_Robot():
     def __init__(self) -> None:
@@ -56,23 +55,3 @@ class Move_Robot():
                 return False
 
         return True
-
-    @staticmethod
-    def get_link_pose(name: str) -> Pose:
-        """
-        Retrieve an object pose from the gazebo world.
-
-        Parameters
-        ----------
-        name : string
-            name of the object in the gazebo world
-
-        Returns
-        -------
-        `Pose` : current pose of the object in the gazebo world
-        """
-        rospy.wait_for_service('/gazebo/get_link_state')
-        link_state_client = rospy.ServiceProxy( '/gazebo/get_link_state', GetLinkState)
-        state = link_state_client.call(link_name=name, reference_frame='map')
-
-        return state.link_state.pose
