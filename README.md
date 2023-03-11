@@ -6,6 +6,9 @@ Automatic Grasp Success/Failure Checker based on Gazebo (ROS1). Depending on use
 - [Repository Structure](#repository-structure)
 - [Download Process](#download-process)
 - [Simulation](#simulation)
+    - [Gazebo Only](#gazebo-only)
+    - [MoveIt Only](#moveit-only)
+    - [MoveIt and Gazebo](#moveit-and-gazebo)
 - [Automated Grasping](#automated-grasping)
     - [How to Run](#how-to-run)
     - [Grasp Representation](#grasp-representation)
@@ -44,7 +47,21 @@ It also depends on **numpy**, **scipy**, and **tqdm**:
 
 ## Simulation
 
+### Gazebo Only:
+
+> **Note**
+This launch file is only for **model visualization** purpose. No ROS controllers will get initialized.
+
+    roslaunch gripkit_cr_plus_l_bb_description gazebo.launch
+    
+### MoveIt Only:
+
+    roslaunch gripkit_cr_plus_l_bb_moveit_config demo.launch
+
+### MoveIt and Gazebo:
+
     roslaunch gripkit_cr_plus_l_bb_moveit_config demo_gazebo.launch
+    
 
 ## Automated Grasping
 
