@@ -1,4 +1,5 @@
 # grasp-factory
+
 Automatic Grasp Success/Failure Checker based on Gazebo (ROS1). Depending on user's inputs (e.g., list of planned grasps), the program spawns an obect and a gripper ([Gripkit-CR-Plus-L](https://weiss-robotics.com/gripkit/)) models to check if each planned grasp succeeds or fails.
 
 <p align="center">
