@@ -100,14 +100,13 @@ class Auto_grasp():
 
         for obj in self.sdf_names:
             entire_list = []
-            patch_dict = f'{self.grasp_dicts}/{obj}'
+            patch_dict = f'{self.grasp_dicts}/{obj}/{obj}'
             centers, directions, aprvs = grasp_gen(path=patch_dict)
 
             for idx in tqdm(range(directions.shape[1])):
-                prob = self.execute(centers[:,idx], directions[:,idx], obj, aprvs[idx])
-                if prob >= 0:
-                    print(f'Object: {obj}')
-                    print(f'Probabilities: {prob}')
+                prob = self.execute(centers[:,idx], directions[:,idx], obj, aprvs[idx]) if aprvs[idx] else -1
+                print(f'Object: {obj}')
+                print(f'Probabilities: {prob}')
                 entire_list.append(prob)
 
             if args.save_probs:
