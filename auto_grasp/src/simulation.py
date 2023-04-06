@@ -19,8 +19,10 @@ def parse_args(argv=None) -> None:
                         help='sdf files of objects we sequentially spawn in the gazebo world.')
     parser.add_argument('--grasp_dicts', default='../../models/dict', type=str,
                         help='root_dir to a .txt file of cpps.')
+    parser.add_argument('--noisy_pose', default=True, type=bool,
+                        help='whether add noise on spawn pose or not.')
     parser.add_argument('--save_probs', default=True, type=bool,
-                        help='whether to save the simulation results.')
+                        help='whether save the simulation results.')
 
     global args
     args = parser.parse_args(argv)
@@ -59,8 +61,11 @@ class Auto_grasp():
             time.sleep(0.5)
             # T = grasp config w.r.t an object frame
             unit_direction = direction / np.linalg.norm(direction)
-            T_inv = self.conv.cpp2T(center=center, direction=unit_direction, aprv=aprv)
-            spawn_pose = self.conv.T2pose(self.init_T @ T_inv) 
+            if args.noisy_pose:
+                final_T = self.conv.gaussian_noise(T=self.init_T @ T_inv)
+            else:
+                final_T = self.init_T @ T_inv
+            spawn_pose = self.conv.T2pose(T=final_T) 
 
             self.EM.spawn_object(name=self.name, pose=spawn_pose, sdf_name=sdf_name)
             time.sleep(0.5)
