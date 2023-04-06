@@ -77,6 +77,30 @@ class Conversion():
         res[:3,3] = -R.T @ center
         
         return res
+
+    @staticmethod
+    def gaussian_noise(T: np.ndarray, bound: list = [5., 0.01]) -> np.ndarray:
+        """
+        Add truncated gaussian noise to an object pose. 
+
+        Parameters
+        ----------
+        T : 4x4 : obj : `np.ndarray`
+            initial object pose
+        bound : 1x2 : obj : `list`
+            noise bounds in degrees and meters
+
+        Returns
+        -------
+        T : 4x4 : obj : `np.ndarray`
+            noise added object pose
+        """
+        noise_array = truncnorm(a=-1, b=1).rvs(size=6)
+        R_n = R.from_euler('xyz', bound[0] * noise_array[:3], degrees=True)
+        T[:3,:3] = T[:3,:3] @ R_n
+        T[:3,3] = bound[1] * noise_array[3:]
+
+        return T
     
 def grasp_gen(path: str = None) -> np.ndarray:
     """
