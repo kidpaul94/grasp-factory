@@ -96,9 +96,9 @@ class Conversion():
             noise added object pose
         """
         noise_array = truncnorm(a=-1, b=1).rvs(size=6)
-        R_n = R.from_euler('xyz', bound[0] * noise_array[:3], degrees=True)
+        R_n = R.from_euler('xyz', bound[0] * noise_array[:3], degrees=True).as_matrix()
         T[:3,:3] = T[:3,:3] @ R_n
-        T[:3,3] = bound[1] * noise_array[3:]
+        T[:3,3] += bound[1] * noise_array[3:]
 
         return T
     
