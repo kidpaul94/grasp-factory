@@ -93,4 +93,4 @@ The image above shows the **grasping center & direction & approach vector** form
 
 | **Model & Controller parameters tuning** | ![Progress](https://progress-bar.dev/100) |
 | --- | --- |
-| **Documentation** | ![Progress](https://progress-bar.dev/50) |
+| **Documentation** | ![Progress](https://progress-bar.dev/100) |
