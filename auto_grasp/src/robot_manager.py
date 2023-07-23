@@ -8,30 +8,37 @@ class Move_Robot():
         mc.roscpp_initialize(sys.argv)
         self.gripper = mc.MoveGroupCommander("gripper_fingers")
 
-    def gripper_control(self, command: bool = True) -> None:
+    def gripper_control(self, width: float, command: bool = True) -> None:
         """
         Open or close gripper. 
 
         Parameters
         ----------
+        width: float
+            targed closing width of the robot gripper
         command: bool
             close (True) or open (False) the robot gripper
 
         Returns
         -------
-        None
+        target_config: 1x2 : obj : `list`
+            target gripper configuration
         """
         if command:
-            self.gripper.go([0.0065, -0.0065], wait=True)
+            target_config = [0.009 - 0.001 * width, -0.009 + 0.001 * width]
         else:
-            self.gripper.go([-0.021, 0.021], wait=True)
+            target_config = [-width, width]
+        self.gripper.go(target_config, wait=True) # 0.0065
         self.gripper.stop()
 
+        return target_config
+
     @staticmethod
-    def is_grasped(joint_names: list = ['Slider01', 'Slider02'], close_pos: list = [0.0065, -0.0065],
+    def is_grasped_F(joint_names: list = ['Slider01', 'Slider02'], close_pos: list = [0.0065, -0.0065],
                    threshold: float = 0.0005):
         """
-        Check if an object is successfully grasped.
+        Check whether the object is grasped or not by comparing commanded 
+        and actual gripper configurations (This is more useful for full-stroke grasping). 
 
         Parameters
         ----------
@@ -40,8 +47,7 @@ class Move_Robot():
         close_pos : 1xN : obj : `list`
             list of closed gripper joint positions
         threshold : float
-            threshold value to determin whether the object is 
-            within two fingers
+            threshold value to determin whether the object is within two fingers
 
         Returns
         -------
@@ -55,3 +61,26 @@ class Move_Robot():
                 return False
 
         return True
+
+    @staticmethod
+    def is_grasped_Z(obj_positon_z: float, threshold: float = 0.5):
+        """
+        Check whether the object is grasped or not by checking the z position
+        of the object.
+
+        Parameters
+        ----------
+        obj_positon_z : float
+            z position of the object after grasping
+        threshold : float
+            threshold value to determin whether the object is fallen or not
+
+        Returns
+        -------
+        bool : whether succeed in grasping    
+        """
+        if obj_positon_z < threshold:   
+            return False
+
+        return True
+    
