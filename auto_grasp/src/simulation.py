@@ -57,10 +57,12 @@ class Auto_grasp():
         """
         attempt, total = 0, len(aprvs)
         for aprv in aprvs:
-            self.mr.gripper_control(command=False)
+            _ = self.mr.gripper_control(width=0.021, command=False)
             time.sleep(0.5)
             # T = grasp config w.r.t an object frame
-            unit_direction = direction / np.linalg.norm(direction)
+            norm = np.linalg.norm(direction)
+            unit_direction = direction / norm
+            T_inv = self.conv.cpp2T(center=center, direction=unit_direction, aprv=aprv)
             if args.noisy_pose:
                 final_T = self.conv.gaussian_noise(T=self.init_T @ T_inv)
             else:
@@ -71,12 +73,13 @@ class Auto_grasp():
             time.sleep(0.5)
             self.EM.sync_with_gazebo()
             time.sleep(0.5)
-            self.mr.gripper_control()
+            _ = self.mr.gripper_control(width=norm * 0.5)
             time.sleep(1.0)
             self.EM.set_link_prop(name='object') # must be a link name in model.sdf
             time.sleep(1.0)
+            z_value = self.EM.get_object_pose(name=self.name).position.z
 
-            if self.mr.is_grasped():
+            if self.mr.is_grasped_Z(obj_positon_z=z_value, threshold=0.6):
                 attempt = attempt + 1
             print(f'{attempt} out of {total} succeeded!!!')
 
