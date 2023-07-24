@@ -99,7 +99,7 @@ class Conversion():
         noise_position = np.random.normal(mu[0],sigma[0],3)
         noise_orientation = np.random.normal(mu[1],sigma[1],3)
         noise_position = np.clip(noise_position, -bouds[0], bouds[0]) * 0.01
-        noise_orientation = np.clip(noise_orientation, -bouds[5], bouds[5]) * np.pi / 180
+        noise_orientation = np.clip(noise_orientation, -bouds[1], bouds[1]) * np.pi / 180
         R_n = R.from_euler('xyz', noise_orientation).as_matrix()
         T[:3,:3] = T[:3,:3] @ R_n
         T[:3,3] += noise_position
