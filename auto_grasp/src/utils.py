@@ -79,7 +79,8 @@ class Conversion():
         return res
 
     @staticmethod
-    def gaussian_noise(T: np.ndarray, bound: list = [5., 0.01]) -> np.ndarray:
+    def gaussian_noise(T: np.ndarray, mu: list = [0.0, 0.0], sigma: list = [0.4, 2.0], 
+                       bouds: list = [1.0, 5.0]) -> np.ndarray:
         """
         Add truncated gaussian noise to an object pose. 
 
@@ -95,10 +96,13 @@ class Conversion():
         T : 4x4 : obj : `np.ndarray`
             noise added object pose
         """
-        noise_array = truncnorm(a=-1, b=1).rvs(size=6)
-        R_n = R.from_euler('xyz', bound[0] * noise_array[:3], degrees=True).as_matrix()
+        noise_position = np.random.normal(mu[0],sigma[0],3)
+        noise_orientation = np.random.normal(mu[1],sigma[1],3)
+        noise_position = np.clip(noise_position, -bouds[0], bouds[0]) * 0.01
+        noise_orientation = np.clip(noise_orientation, -bouds[5], bouds[5]) * np.pi / 180
+        R_n = R.from_euler('xyz', noise_orientation).as_matrix()
         T[:3,:3] = T[:3,:3] @ R_n
-        T[:3,3] += bound[1] * noise_array[3:]
+        T[:3,3] += noise_position
 
         return T
     
