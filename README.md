@@ -8,7 +8,6 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![support level: community](https://img.shields.io/badge/support%20level-community-lightgray.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
 Automatic Grasp Success/Failure Checker based on Gazebo (ROS1). Depending on user's inputs (e.g., list of planned grasps), the program spawns an object and a gripper ([Gripkit-CR-Plus-L](https://weiss-robotics.com/gripkit/)) models to check if each planned grasp succeeds or fails.
 
