@@ -1,6 +1,6 @@
 import rospy
 from geometry_msgs.msg import Pose
-from gazebo_msgs.srv import GetWorldProperties, SpawnModel, DeleteModel, SetLinkProperties
+from gazebo_msgs.srv import GetWorldProperties, SpawnModel, DeleteModel, SetLinkProperties, GetModelState
 
 class EnvManager():
     def __init__(self) -> None:
@@ -111,3 +111,23 @@ class EnvManager():
         rospy.wait_for_service('/gazebo/set_link_properties')
         link_state_client = rospy.ServiceProxy( '/gazebo/set_link_properties', SetLinkProperties)
         link_state_client.call(link_name=name, gravity_mode=True)
+
+    @staticmethod
+    def get_object_pose(name: str) -> Pose:
+        """
+        Retrieve an object pose from the gazebo world.
+
+        Parameters
+        ----------
+        name : string
+            name of the object in the gazebo world
+
+        Returns
+        -------
+        `Pose` : current pose of the object in the gazebo world
+        """
+        rospy.wait_for_service('/gazebo/get_model_state')
+        model_state_client = rospy.ServiceProxy( '/gazebo/get_model_state', GetModelState)
+        state = model_state_client.call(model_name=name, relative_entity_name='map')
+
+        return state.pose
