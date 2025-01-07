@@ -102,6 +102,6 @@ The image above shows the **grasping center & direction & approach vector** form
 
 ## ToDo Lists
 
-| **Model & Controller parameters tuning** | ![Progress](https://progress-bar.dev/100) |
+| **Model & Controller parameters tuning** | ![Progress](https://geps.dev/progress/100) |
 | --- | --- |
-| **Documentation** | ![Progress](https://progress-bar.dev/100) |
+| **Documentation** | ![Progress](https://geps.dev/progress/100) |
