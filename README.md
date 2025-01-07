@@ -49,7 +49,7 @@ The project was done while [Hojun Lee](https://www.linkedin.com/in/hjunlee94/) w
 
 ## Download Process
 
-> **Note**
+> [!NOTE]
 This repository has been tested on [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu) and [Ubuntu 20.04](https://releases.ubuntu.com/focal/).
 It also depends on **numpy**, **scipy**, and **tqdm**:
 
@@ -65,7 +65,7 @@ It also depends on **numpy**, **scipy**, and **tqdm**:
 
 ### Gazebo Only:
 
-> **Note**
+> [!NOTE]
 This launch file is only for **model visualization** purpose. No ROS controllers will get initialized.
 
     roslaunch gripkit_cr_plus_l_bb_description gazebo.launch
@@ -83,7 +83,7 @@ This launch file is only for **model visualization** purpose. No ROS controllers
 
 ### How to Run:
 
-> **Note**
+> [!NOTE]
 `simulation.py` receives several different arguments. Run the `--help` command to see everything it receives.
 
     cd auto_grasp/src
@@ -91,7 +91,7 @@ This launch file is only for **model visualization** purpose. No ROS controllers
 
 ### Grasp Representation:
 
-> **Note**
+> [!NOTE]
 The representation is defined based on a coordinate system of each object 3D model.
 
 <p align="center">
